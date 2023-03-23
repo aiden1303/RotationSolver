@@ -20,10 +20,10 @@ public sealed class DNC_Default : DNC_Base
     protected override bool AttackAbility(byte abilitiesRemaining, out IAction act)
     {
         act = null;
-        //ÌøÎè×´Ì¬½ûÖ¹Ê¹ÓÃ
+        //è·³èˆçŠ¶æ€ç¦æ­¢ä½¿ç”¨
         if (IsDancing) return false;
 
-        //½ø¹¥Ö®Ì½¸ê
+        //è¿›æ”»ä¹‹æ¢æˆˆ
         if (Devilment.CanUse(out act))
         {
             if (InBurst && !TechnicalStep.EnoughLevel) return true;
@@ -31,24 +31,24 @@ public sealed class DNC_Default : DNC_Base
             if (Player.HasStatus(true, StatusID.TechnicalFinish)) return true;
         }
 
-        //Ó¦¼±»»Îè°é
+        //åº”æ€¥æ¢èˆä¼´
         if (UseClosedPosition(out act)) return true;
 
-        //°Ù»¨
+        //ç™¾èŠ±
         if (Flourish.CanUse(out act)) return true;
 
-        //ÉÈÎè¡¤¼±
+        //æ‰‡èˆÂ·æ€¥
         if (FanDance3.CanUse(out act, mustUse: true)) return true;
 
         if (Player.HasStatus(true, StatusID.Devilment) || Feathers > 3 || !TechnicalStep.EnoughLevel)
         {
-            //ÉÈÎè¡¤ÆÆ
+            //æ‰‡èˆÂ·ç ´
             if (FanDance2.CanUse(out act)) return true;
-            //ÉÈÎè¡¤Ğò
+            //æ‰‡èˆÂ·åº
             if (FanDance.CanUse(out act)) return true;
         }
 
-        //ÉÈÎè¡¤ÖÕ
+        //æ‰‡èˆÂ·ç»ˆ
         if (FanDance4.CanUse(out act, mustUse: true))
         {
             if (TechnicalStep.EnoughLevel && TechnicalStep.IsCoolingDown && TechnicalStep.WillHaveOneChargeGCD()) return false;
@@ -60,26 +60,26 @@ public sealed class DNC_Default : DNC_Base
 
     protected override bool GeneralGCD(out IAction act)
     {
-        //°ó¶¨Îè°é
+        //ç»‘å®šèˆä¼´
         if (!InCombat && !Player.HasStatus(true, StatusID.ClosedPosition1) && ClosedPosition.CanUse(out act)) return true;
 
-        //½áÊøÎè²½
+        //ç»“æŸèˆæ­¥
         if (FinishStepGCD(out act)) return true;
 
-        //Ö´ĞĞÎè²½
+        //æ‰§è¡Œèˆæ­¥
         if (ExcutionStepGCD(out act)) return true;
 
-        //¼¼ÇÉÎè²½
+        //æŠ€å·§èˆæ­¥
         if (InBurst && InCombat && TechnicalStep.CanUse(out act, mustUse: true)) return true;
 
-        //¹¥»÷GCD
+        //æ”»å‡»GCD
         if (AttackGCD(out act, Player.HasStatus(true, StatusID.Devilment))) return true;
 
         return false;
     }
 
     /// <summary>
-    /// ¹¥»÷GCD
+    /// æ”»å‡»GCD
     /// </summary>
     /// <param name="act"></param>
     /// <param name="breaking"></param>
@@ -87,32 +87,34 @@ public sealed class DNC_Default : DNC_Base
     bool AttackGCD(out IAction act, bool breaking)
     {
         act = null;
-        //ÌøÎè×´Ì¬½ûÖ¹Ê¹ÓÃ
+        //è·³èˆçŠ¶æ€ç¦æ­¢ä½¿ç”¨
         if (IsDancing) return false;
 
-        //½£Îè
-        if ((breaking || Esprit >= 85) && SaberDance.CanUse(out act, mustUse: true)) return true;
-
-        //ÌáÀ­ÄÉ
-        if (Tillana.CanUse(out act, mustUse: true)) return true;
-
-        //Á÷ĞÇÎè
+        //å‰‘èˆ
+        if ((breaking || Esprit >= 75) && SaberDance.CanUse(out act, mustUse: true)) return true;
+        
+        
+        //æµæ˜Ÿèˆ
         if (StarfallDance.CanUse(out act, mustUse: true)) return true;
 
-        //Ê¹ÓÃ±ê×¼Îè²½
+
+        //ææ‹‰çº³
+        if (Tillana.CanUse(out act, mustUse: true)) return true;
+
+        //ä½¿ç”¨æ ‡å‡†èˆæ­¥
         if (UseStandardStep(out act)) return true;
 
-        //´¥·¢AOE
+        //è§¦å‘AOE
         if (Bloodshower.CanUse(out act)) return true;
         if (Fountainfall.CanUse(out act)) return true;
-        //´¥·¢µ¥Ìå
+        //è§¦å‘å•ä½“
         if (RisingWindmill.CanUse(out act)) return true;
         if (ReverseCascade.CanUse(out act)) return true;
 
-        //»ù´¡AOE
+        //åŸºç¡€AOE
         if (Bladeshower.CanUse(out act)) return true;
         if (Windmill.CanUse(out act)) return true;
-        //»ù´¡µ¥Ìå
+        //åŸºç¡€å•ä½“
         if (Fountain.CanUse(out act)) return true;
         if (Cascade.CanUse(out act)) return true;
 
@@ -120,7 +122,7 @@ public sealed class DNC_Default : DNC_Base
     }
 
     /// <summary>
-    /// Ê¹ÓÃ±ê×¼Îè²½
+    /// ä½¿ç”¨æ ‡å‡†èˆæ­¥
     /// </summary>
     /// <param name="act"></param>
     /// <returns></returns>
@@ -129,20 +131,20 @@ public sealed class DNC_Default : DNC_Base
         if (!StandardStep.CanUse(out act, mustUse: true)) return false;
         if (Player.WillStatusEndGCD(2, 0, true, StatusID.StandardFinish)) return true;
 
-        //µÈ¼¶µÍÓÚÍæ¼ÒÌ«¶à²»ÌøÎè,¶¼Ö±½ÓÃëÁË»¹ÌøÉ¶Îè
+        //ç­‰çº§ä½äºç©å®¶å¤ªå¤šä¸è·³èˆ,éƒ½ç›´æ¥ç§’äº†è¿˜è·³å•¥èˆ
         if (Level - Target.Level > 10) return false;
 
-        //ÖÜÎ§Ã»ÓĞµĞÈË²»ÌøÎè
+        //å‘¨å›´æ²¡æœ‰æ•Œäººä¸è·³èˆ
         if (!HasHostilesInRange) return false;
 
-        //¼¼ÇÉÎè²½×´Ì¬ºÍ¿ìÀäÈ´ºÃÊ±²»ÊÍ·Å
+        //æŠ€å·§èˆæ­¥çŠ¶æ€å’Œå¿«å†·å´å¥½æ—¶ä¸é‡Šæ”¾
         if (TechnicalStep.EnoughLevel && (Player.HasStatus(true, StatusID.TechnicalFinish) || TechnicalStep.IsCoolingDown && TechnicalStep.WillHaveOneCharge(5))) return false;
 
         return true;
     }
 
     /// <summary>
-    /// Ó¦¼±»»Îè°é
+    /// åº”æ€¥æ¢èˆä¼´
     /// </summary>
     /// <param name="act"></param>
     /// <returns></returns>
@@ -150,7 +152,7 @@ public sealed class DNC_Default : DNC_Base
     {
         if (!ClosedPosition.CanUse(out act)) return false;
 
-        //Ó¦¼±»»Îè°é
+        //åº”æ€¥æ¢èˆä¼´
         if (InCombat && Player.HasStatus(true, StatusID.ClosedPosition1))
         {
             foreach (var friend in PartyMembers)
@@ -173,7 +175,7 @@ public sealed class DNC_Default : DNC_Base
         act = null;
         if (!IsDancing) return false;
 
-        //±ê×¼Îè²½½áÊø
+        //æ ‡å‡†èˆæ­¥ç»“æŸ
         if (Player.HasStatus(true, StatusID.StandardStep) && (Player.WillStatusEnd(1, true, StatusID.StandardStep) || CompletedSteps == 2 && Player.WillStatusEnd(1, true, StatusID.StandardFinish))
             || StandardFinish.CanUse(out _, mustUse: true))
         {
@@ -181,7 +183,7 @@ public sealed class DNC_Default : DNC_Base
             return true;
         }
 
-        //¼¼ÇÉÎè²½½áÊø
+        //æŠ€å·§èˆæ­¥ç»“æŸ
         if (Player.HasStatus(true, StatusID.TechnicalStep) && Player.WillStatusEnd(1, true, StatusID.TechnicalStep) || TechnicalFinish.CanUse(out _, mustUse: true))
         {
             act = TechnicalStep;
