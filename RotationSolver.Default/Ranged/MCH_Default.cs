@@ -19,7 +19,9 @@ public sealed class MCH_Default : MCH_Base
             .SetBool("MCH_Opener", true, "Basic Opener")
             .SetBool("MCH_Automaton", true, "Care for Automation")
             .SetBool("MCH_Reassemble", true, "Ressamble for ChainSaw")
-            .SetBool("DelayHypercharge", false, "Use Hypercharge late");
+            .SetBool("DelayHypercharge", false, "Use Hypercharge late")
+            .SetBool("MCH_Opener_V2", false, "Opener V2");
+
     }
 
     protected override bool GeneralGCD(out IAction act)
@@ -131,6 +133,15 @@ public sealed class MCH_Default : MCH_Base
         return false;
     }
 
+    private bool CanUseBarrelStabilizer(out IAction act)
+    {
+        if (!BarrelStabilizer.CanUse(out act)) return false;
+        
+        if (Heat >20) return false;
+
+        return true;
+    }
+
     /// <summary>
     /// 判断能否使用野火
     /// </summary>
@@ -138,24 +149,28 @@ public sealed class MCH_Default : MCH_Base
     /// <returns></returns>
     private bool CanUseWildfire(out IAction act)
     {
-        if (!Wildfire.CanUse(out act)) return false;
+        //if (!Wildfire.CanUse(out act)) return false;
 
-        if (Heat < 50 && !IsOverheated) return false;
+        if (Heat > 50 && !IsOverheated) return false;
 
         //小怪和AOE期间不打野火
         if (SpreadShot.CanUse(out _) || PartyMembers.Count() is > 1 and <= 4 && !Target.IsBoss()) return false;
 
         //在过热时
-        if (IsLastAction(true, Hypercharge)) return true;
+        if (IsLastAction(true, ChainSaw)) return false;
 
         if (ChainSaw.EnoughLevel && !ChainSaw.IsCoolingDown) return false;
 
         if (Hypercharge.IsCoolingDown) return false;
 
-        //当上一个技能是钻头,空气锚,热冲击时不释放野火
-        if (IsLastGCD(true, Drill, HeatBlast, AirAnchor)) return false;
+            //当上一个技能是钻头,空气锚,热冲击时不释放野火
+            //if (IsLastGCD(true, Drill, HeatBlast, AirAnchor, ChainSaw, Reassemble)) return false;
 
-        return true;
+            //if (IsLastAction(true, ChainSaw)) return false;
+
+            //if (!Reassemble.WillHaveOneChargeGCD(1)) return false;
+
+            return true;
     }
 
     /// <summary>
@@ -188,11 +203,16 @@ public sealed class MCH_Default : MCH_Base
         //等级低于野火
         if (!Wildfire.EnoughLevel) return true;
 
+        if (!Wildfire.IsCoolingDown) return true;
+
+        if (!Wildfire.WillHaveOneChargeGCD(6)) return true;
+
         //野火前攒热量
         if (!Wildfire.WillHaveOneChargeGCD(5) && Wildfire.WillHaveOneChargeGCD(18))
         {
             //如果期间热量溢出超过5,就释放一次超荷
-            if (IsLastGCD((ActionID)Drill.ID) && Heat >= 85) return true;
+            if (Heat >= 50) return true;
+            //if (IsLastGCD(true, Drill, HeatBlast, AirAnchor, ChainSaw) && Heat >= 50) return true;
             return false;
         }
         else return true;
@@ -222,7 +242,7 @@ public sealed class MCH_Default : MCH_Base
 
         //机器人吃团辅判断
         if (AirAnchor.IsCoolingDown && AirAnchor.WillHaveOneChargeGCD() && Battery > 80) return true;
-        if (ChainSaw.WillHaveOneCharge(4) || ChainSaw.IsCoolingDown && !ChainSaw.ElapsedAfterGCD(3) && Battery <= 60) return true;
+        if (ChainSaw.WillHaveOneCharge(4) || ChainSaw.IsCoolingDown && !ChainSaw.ElapsedAfterGCD(3) && Battery <= 80) return true;
 
         return false;
     }
